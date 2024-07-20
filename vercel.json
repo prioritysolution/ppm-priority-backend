@@ -1,6 +1,5 @@
 {
     "version": 2,
-    "framwork": null,
     "functions":{
         "public/index.php":{"runtime":"vercel-php"}
     },
