@@ -316,4 +316,60 @@ class ProcessingProcess extends Controller
         
       
     }
+
+    public function get_tank_item_rate(Request $request){
+        $validator = Validator::make($request->all(),[
+            'Item_Id' =>'required',
+            'Sales_Date' => 'required',
+            'org_id' => 'required'
+        ]);
+
+        if($validator->passes()){
+            try {
+                $sql = DB::select("Select UDF_GET_ORG_SCHEMA(?) as db;",[$request->org_id]);
+                if(!$sql){
+                  throw new Exception;
+                }
+                $org_schema = $sql[0]->db;
+                $db = Config::get('database.connections.mysql');
+                $db['database'] = $org_schema;
+                config()->set('database.connections.petro', $db);
+    
+                $sql = DB::connection('petro')->Select("Select UDF_GET_ITEM_RATE(?,?) As Item_Rate;",[$request->Item_Id,$request->Sales_Date]);
+    
+                if(!$sql){
+                    throw new Exception;
+                }
+    
+                $Item_Rate = $sql[0]->Item_Rate;
+    
+                return response()->json([
+                    'messsage' =>'Data Found',
+                    'status'=>200,
+                    'Data' => $Item_Rate
+                ],200);
+            } catch (\Throwable $th) {
+                $response = response()->json([
+                    'message' => 'Error Found',
+                    'status'=>400,
+                    'details' => $ex->getmessage(),
+                ],400);
+    
+                throw new HttpResponseException($response);
+            }
+            
+        }
+        else{
+            $errors = $validator->errors();
+
+        $response = response()->json([
+          'message' => 'Invalid data send',
+          'status'=>400,
+          'details' => $errors->messages(),
+      ],400);
+  
+      throw new HttpResponseException($response);
+        }
+
+    }
 }

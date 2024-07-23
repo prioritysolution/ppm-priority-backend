@@ -3038,4 +3038,41 @@ throw new HttpResponseException($response);
         throw new HttpResponseException($response);
     }
   }
+
+  public function get_cust_info(Int $org_id,Int $cust_id){
+    try {
+      $sql = DB::select("Select UDF_GET_ORG_SCHEMA(?) as db;",[$org_id]);
+      if(!$sql){
+        throw new Exception;
+      }
+      $org_schema = $sql[0]->db;
+      $db = Config::get('database.connections.mysql');
+      $db['database'] = $org_schema;
+      config()->set('database.connections.petro', $db);
+      
+      
+      $sql = DB::connection('petro')->select("Select Id,Cust_Name,Cust_Addr,Cust_Mobile,Cust_Mail,Cust_GSTIN From mst_customer Where Id=?;",[$cust_id]);
+      if(!$sql){
+        throw new Exception;
+      }
+      return response()->json([
+          'messsage' =>'Data Found',
+          'status'=>200,
+          'Data' => $sql
+      ],200);
+
+
+    } catch (Exception $ex) {
+        DB::connection('petro')->rollBack();
+        $response = response()->json([
+            'message' => 'Error Found',
+            'status' =>400,
+            'details' => $ex->getmessage(),
+        ],400);
+
+        throw new HttpResponseException($response);
+    }
+
+
+  }
 }

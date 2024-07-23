@@ -91,11 +91,13 @@ Route::group([
     Route::get('/master/getRateItem/{org_id}',[ProcessMaster::class,'get_rate_item']);
     Route::get('/master/GetTankItem/{org_id}',[ProcessMaster::class,'get_tank_item']);
     Route::get('/master/GetOtherItem/{org_id}',[ProcessMaster::class,'get_other_item']);
+    Route::get('/master/GetCustDetails/{org_id}/{cust_id}',[ProcessMaster::class,'get_cust_info']);
 
     // processing process route
 
     Route::post('/processing/GetReadingData',[ProcessingProcess::class,'get_read_data']);
     Route::post('/processing/GetGSTData',[ProcessingProcess::class,'get_gst_item_data']);
     Route::post('/processing/ProcessMeterRead',[ProcessingProcess::class,'process_meter_read']);
+    Route::post('/processing/getItemRate',[ProcessingProcess::class,'get_tank_item_rate']);
 
 });
